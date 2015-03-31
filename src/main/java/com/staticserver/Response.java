@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.common.Config;
+
 public class Response {
 
 	private final OutputStream out;
@@ -24,7 +26,7 @@ public class Response {
 		FileInputStream fin = null;
 		try {
 			byte[] buff = new byte[BUFFSIZE];
-			File file = new File(StaticURLServer.WEBROOT, request.getUrl());
+			File file = new File(Config.getConfig().getWebRoot(), request.getUrl());
 			if(file.exists()) {
 				fin = new FileInputStream(file);
 				int ch = fin.read(buff, 0, BUFFSIZE);
@@ -33,12 +35,13 @@ public class Response {
 					ch = fin.read(buff, 0, BUFFSIZE);
 				}
 			} else {
-					String errorMessage = "HTTP/1.1 404 File not Found\r\n"
-							+ "Content-Type: text/html\r\n"
-							+ "Content-Length: 23\r\n"
-							+ "\r\n"
-							+ "<h1>404 File not Found</h1>";
-					out.write(errorMessage.getBytes());
+				File file1 = new File(Config.getConfig().getWebRoot(), "404.html");
+				fin = new FileInputStream(file1);
+				int ch = fin.read(buff, 0, BUFFSIZE);
+				while(ch != -1) {
+					out.write(buff);
+					ch = fin.read(buff, 0, BUFFSIZE);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

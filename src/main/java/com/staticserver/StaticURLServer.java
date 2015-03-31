@@ -1,25 +1,28 @@
 package com.staticserver;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import com.common.Config;
 public class StaticURLServer {
 
 	private ServerSocket serverSocket;
 	
 	private boolean shutDown = false;
 	
-	public static final String WEBROOT = "." + File.separator + "webroot";
+	private static final String CONFIGFILE = "." + File.separator + "config/config";
 	
-	private static final String SHUTDOWN = "SHUTDOWN";
 	
 	public void await() {
 		try {
-			serverSocket = new ServerSocket(8081, 1, InetAddress.getByName("127.0.0.1"));
+			serverSocket = new ServerSocket(Config.getConfig().getPort(), 1, 
+					InetAddress.getByName(Config.getConfig().getIp()));
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
@@ -45,8 +48,12 @@ public class StaticURLServer {
 		}
 	}
 	
-	public static void main(String[] arg) {
+	
+	public static void main(String[] arg) throws FileNotFoundException, IOException {
 		StaticURLServer server = new StaticURLServer();
+		Config.getConfig(CONFIGFILE);
 		server.await();
 	}
+	
+	
 }
